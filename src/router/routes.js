@@ -16,8 +16,9 @@ const routes = [
       { path: '/Articles/Protokol', component: () => import('pages/Articles/Protokol.vue') },
       { path: '/Articles/NetworkAdapters', component: () => import('pages/Articles/NetworkAdapters.vue') },
       { path: '/Articles/ProgramWorkInNetwork', component: () => import('pages/Articles/ProgramWorkInNetwork.vue') },
-      { path: '/UniqArticle/:id_test', props: true, component: () => import('pages/Articles/UniqArticle.vue') },
+      { path: '/UniqArticle/:id_test', props: true, component: () => import('pages/UniqArticle.vue') },
       { path: '/UniqTesting/:id_test', props: true, component: () => import('pages/UniqTesting.vue') },
+      { path: '/TestingControl/:id_test', props: true, component: () => import('pages/TestingControl.vue') },
       { path: '/ListArticles', component: () => import('pages/ListArticles.vue') },
       { path: '/AboutMe', component: () => import('pages/AboutMe.vue') }
     ]

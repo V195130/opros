@@ -1,7 +1,10 @@
 <template>
-    <div>
-        <h4>{{ ArticleName }}</h4>
-        <div v-html='ArticleText'></div>  
+    <div class = "q-ml-md q-mt-md">
+        <q-btn class = "q-ml-md q-mt-md" color="primary" label="Тренировочный тест" @click="navigate('/UniqTesting/' + id_test)"/>
+        <q-btn class = "q-ml-md q-mt-md" color="red" label="Пройти тест" @click="navigate('/TestingControl/'+id_test)"/>
+
+        <h4  >{{ ArticleName }}</h4>
+        <div v-html='ArticleText' ></div>  
         
     </div>
     
@@ -15,11 +18,18 @@ import { api } from 'boot/axios'
 
  export default {
     
+
    name: 'UniqArticle',
    props: ['id_test'],
    setup(props){
     const ArticleText = ref(null)
     const ArticleName = ref('')
+    const router = useRouter();
+    function navigate(path) {
+        router.push(path);
+    }
+
+
     onMounted(() => {
             getDataTest()
         })
@@ -43,7 +53,7 @@ import { api } from 'boot/axios'
                     })
             }
     return {
-                getDataTest,ArticleText, ArticleName
+                getDataTest,ArticleText, ArticleName,navigate
       }
    }
    

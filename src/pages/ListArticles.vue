@@ -39,7 +39,7 @@ export default {
       router.push({path: '/Articles/' + l.url});
     }
     function GoToPath(l){
-      router.push({path: '/Articles/UniqArticle/'+l.id_test});
+      router.push({path: '/UniqArticle/'+l.id_test});
     }
 
 
