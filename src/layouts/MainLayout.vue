@@ -8,8 +8,8 @@
           </q-avatar>
           Информационные технологии
         </q-toolbar-title>
-        <div v-if="userLogin">
-          {{ userLogin }}
+        <div v-if="userLogin != null">
+          {{ userLogin }}, <br /><span @click="logout()"> Выйти</span>
         </div>
         <div v-else>
           <q-btn
@@ -25,15 +25,20 @@
             :name="currentTheme === 'dark' ? 'light_mode' : 'dark_mode'"
           />
         </q-btn>
-        <q-btn icon="settings" flat @click="openLoginDialog()" />
+        <q-btn
+          v-if="!userLogin"
+          icon="settings"
+          flat
+          @click="openLoginDialog()"
+        />
       </q-toolbar>
 
       <q-tabs align="left">
         <q-route-tab to="/ListArticles" label="статьи" />
         <q-route-tab to="/UniqTesting/1" label="Тестирование" />
         <q-route-tab to="/AboutMe" label="Об Авторе" />
-        <q-route-tab to="/Admin/ListLogins" label="Записи" />
-        <q-route-tab to="/Admin/AdminArticle" label="таблица" />
+        <q-route-tab :to="'/Admin/ListLogins/' + id_user" label="Записи" />
+        <q-route-tab to="/Admin/AdminArticles" label="Статьи" />
       </q-tabs>
     </q-header>
 
@@ -45,20 +50,26 @@
 
 <script>
 import { useQuasar } from "quasar";
-import { ref, onMounted } from "vue";
+import { ref, onMounted, computed } from "vue";
 import { useRouter } from "vue-router";
+import { useUserStore } from "stores/userStore";
+
 export default {
   setup() {
     const currentTheme = ref("light");
     const $q = useQuasar();
     const router = useRouter();
 
-    const userLogin = ref(null);
+    const userStore = useUserStore();
 
-    onMounted(() => {
-      const userLogin = localStorage.getItem("dfg");
-      return userLogin || null; // Вернёт null, если login отсутствует
-    });
+    const userLogin = computed(() => userStore.login || null);
+    const id_user = computed(() => userStore.id_user || null);
+    const isAdmin = computed(() => userStore.role == "admin");
+
+    function logout() {
+      console.log("выход");
+      userStore.clearUser();
+    }
 
     function toggleTheme() {
       currentTheme.value = currentTheme.value === "dark" ? "light" : "dark";
@@ -74,6 +85,9 @@ export default {
       currentTheme,
       openLoginDialog,
       userLogin,
+      id_user,
+      logout,
+      isAdmin,
     };
   },
 };

@@ -73,8 +73,8 @@ const routes = [
         component: () => import("pages/Admin/ListLogins.vue"),
       },
       {
-        path: "/Admin/AdminArticle",
-        component: () => import("pages/Admin/AdminArticle.vue"),
+        path: "/Admin/AdminArticles",
+        component: () => import("pages/Admin/AdminArticles.vue"),
       },
       { path: "/LoginUser", component: () => import("pages/LoginUser.vue") },
       { path: "/AboutMe", component: () => import("pages/AboutMe.vue") },

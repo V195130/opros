@@ -6,8 +6,8 @@
   </q-input>
 
   <q-table
-    title="Список Сервисов"
-    :rows="ListLogins"
+    title="Статьи"
+    :rows="ListTest"
     :columns="columns"
     row-key="id"
     flat
@@ -23,47 +23,38 @@
     <!-- Слот для кастомизации действий -->
     <template v-slot:body-cell-actions="props">
       <q-td :props="props">
-        <q-btn flat icon="edit" color="green" @click="editService(props.row)" />
-        <q-btn
-          flat
-          icon="delete"
-          color="red"
-          @click="deleteService(props.row)"
-        />
+        <q-btn flat icon="edit" color="green" @click="editTest(props.row)" />
+        <q-btn flat icon="delete" color="red" @click="deleteTest(props.row)" />
       </q-td>
     </template>
   </q-table>
   <div class="flex flex-center q-mt-md">
     <q-form
-      @submit="addService()"
+      @submit="addTest()"
       @reset="resetForm"
       class="q-gutter-md"
       style="width: 400px"
     >
       <q-input
         filled
-        v-model="newService.service_name"
-        label="Название сервиса"
+        v-model="newTest.name_test"
+        label="Название Статьи"
         required
       />
-      <q-input filled v-model="newService.login" label="Логин" />
+
+      <q-input filled v-model="newTest.description_test" label="Описание" />
       <q-input
         filled
-        v-model="newService.password"
-        label="Пароль"
-        type="password"
-      />
-      <q-input
-        filled
-        v-model="newService.comment"
-        label="Комментарий"
+        v-model="newTest.article"
+        label="Содержание статьи"
         type="textarea"
       />
       <div>
         <q-btn
           :label="isEdit ? 'Изменить' : 'Добавить'"
-          @click="addService()"
+          @click="addTest()"
           color="primary"
+          class="q-mr-md"
         />
         <q-btn label="Сбросить" type="reset" color="secondary" />
       </div>
@@ -86,33 +77,26 @@ import { useQuasar } from "quasar";
 import { api } from "boot/axios";
 
 export default {
-  name: "ListLogins",
+  name: "AdminArticle",
   setup() {
     const router = useRouter();
-    const currentUser = ref(2);
-    const ListLogins = ref([]);
+    const currentTest = ref(2);
+    const ListTest = ref([]);
     const isEdit = ref(false);
     const columns = ref([
       {
-        name: "service_name",
+        name: "name_test",
         required: true,
-        label: "Сервис",
+        label: "Название статьи",
         align: "left",
-        field: "service_name",
+        field: "name_test",
         sortable: true,
       },
       {
-        name: "login",
+        name: "description_test",
         align: "left",
-        label: "Логин",
-        field: "login",
-        sortable: true,
-      },
-      { name: "password", label: "Пароль", field: "password" },
-      {
-        name: "comment",
-        label: "Комментарий",
-        field: "comment",
+        label: "Описание статьи",
+        field: "description_test",
         sortable: true,
       },
       {
@@ -122,13 +106,41 @@ export default {
         sortable: false,
       },
     ]);
+    // const columns = ref([
+    //   {
+    //     name: "service_name",
+    //     required: true,
+    //     label: "Сервис",
+    //     align: "left",
+    //     field: "service_name",
+    //     sortable: true,
+    //   },
+    //   {
+    //     name: "login",
+    //     align: "left",
+    //     label: "Логин",
+    //     field: "login",
+    //     sortable: true,
+    //   },
+    //   { name: "password", label: "Пароль", field: "password" },
+    //   {
+    //     name: "comment",
+    //     label: "Комментарий",
+    //     field: "comment",
+    //     sortable: true,
+    //   },
+    //   {
+    //     name: "actions",
+    //     label: "Действия",
+    //     field: "actions",
+    //     sortable: false,
+    //   },
+    // ]);
     const $q = useQuasar();
-    const newService = ref({
-      service_name: "",
-      login: "",
-      password: "",
-      comment: "",
-      id_user: currentUser.value,
+    const newTest = ref({
+      name_test: "",
+      description_test: "",
+      id_test: currentTest.value,
     });
     const search = ref("");
 
@@ -136,23 +148,23 @@ export default {
       getDataList();
     });
 
-    function editService(data) {
-      console.log("editService", data);
+    function editTest(data) {
+      console.log("editTest", data);
       isEdit.value = true;
-      newService.value = JSON.parse(JSON.stringify(toRaw(data)));
+      newTest.value = JSON.parse(JSON.stringify(toRaw(data)));
     }
 
-    function deleteService(service) {
+    function deleteTest(service) {
       $q.dialog({
         title: "Подтвердить удаление",
-        message: `Вы уверены, что хотите удалить запись "${service.service_name}"?`,
+        message: `Вы уверены, что хотите удалить запись "${service.name_test}"?`,
         cancel: true,
         persistent: true,
       }).onOk(() => {
         let serv = toRaw(service);
 
         api
-          .delete("/records/logins/" + serv.id_login)
+          .delete("/records/tests/")
           .then((response) => {
             if (response.data) {
               getDataList();
@@ -163,19 +175,17 @@ export default {
           });
       });
     }
-    function addService() {
+    function addTest() {
       if (isEdit.value) {
         api
-          .put("/records/logins/" + newService.value.id_login, newService.value)
+          .put("/records/tests/" + newTest.value.id_test, newTest.value)
           .then((response) => {
             if (response.data) {
               getDataList();
-              newService.value = {
-                service_name: "",
-                login: "",
-                password: "",
-                comment: "",
-                id_user: currentUser.value,
+              newTest.value = {
+                name_test: "",
+                description_test: "",
+                id_test: currentTest.value,
               };
               isEdit.value = false;
             }
@@ -185,16 +195,14 @@ export default {
           });
       } else {
         api
-          .post("/records/logins", newService.value)
+          .post("/records/tests", newTest.value)
           .then((response) => {
             if (response.data) {
               getDataList();
-              newService.value = {
-                service_name: "",
-                login: "",
-                password: "",
-                comment: "",
-                id_user: currentUser.value,
+              newTest.value = {
+                name_test: "",
+                description_test: "",
+                id_test: currentTest.value,
               };
             }
           })
@@ -203,14 +211,12 @@ export default {
           });
       }
     }
-
     function getDataList() {
       api
-        .get("/records/logins?filter=id_user,eq," + currentUser.value)
+        .get("/records/tests")
         .then((response) => {
           if (response.data) {
-            ListLogins.value = response.data.records;
-            console.log("getDataList", response.data.records);
+            ListTest.value = response.data.records;
           }
         })
         .catch(() => {
@@ -223,16 +229,36 @@ export default {
           // })
         });
     }
+    // function getDataList() {
+    //   api
+    //     .get("/records/tests")
+    //     .then((response) => {
+    //       if (response.data) {
+    //         ListTest.value = response.data.records;
+    //         console.log("getDataList", response.data.records);
+    //         console.log(ListTest.value);
+    //       }
+    //     })
+    //     .catch(() => {
+    //       console.log("error");
+    //       // $q.notify({
+    //       //     color: 'negative',
+    //       //     position: 'top',
+    //       //     message: 'Ошибка загрузки списка установок',
+    //       //     icon: 'report_problem'
+    //       // })
+    //     });
+    // }
 
     return {
-      ListLogins,
+      ListTest,
       columns,
       search,
-      newService,
-      deleteService,
-      addService,
+      newTest,
+      deleteTest,
+      addTest,
       isEdit,
-      editService,
+      editTest,
     };
   },
 };
