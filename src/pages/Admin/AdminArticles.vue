@@ -1,10 +1,4 @@
 <template>
-  <q-input filled v-model="search" placeholder="Поиск..." style="width: 100%">
-    <template v-slot:prepend>
-      <q-icon name="search" />
-    </template>
-  </q-input>
-
   <q-table
     title="Статьи"
     :rows="ListTest"
@@ -14,16 +8,15 @@
     bordered
     virtual-scroll
   >
-    <!-- Слот для кастомного отображения ячеек пароля -->
-    <!-- <template v-slot:body-cell-password="props">
-      <q-td :props="props">
-        {{ props.row.password.replace(/./g, "*") }}
-      </q-td>
-    </template> -->
-    <!-- Слот для кастомизации действий -->
     <template v-slot:body-cell-actions="props">
       <q-td :props="props">
         <q-btn flat icon="edit" color="green" @click="editTest(props.row)" />
+        <q-btn
+          flat
+          icon="help_outline"
+          color="blue"
+          @click="gotoQuestions(props.row.id_test)"
+        />
         <q-btn flat icon="delete" color="red" @click="deleteTest(props.row)" />
       </q-td>
     </template>
@@ -40,6 +33,11 @@
         v-model="newTest.name_test"
         label="Название Статьи"
         required
+        lazy-rules
+        :rules="[
+          (val) =>
+            (val && val.length > 0) || 'Пожалуйста, введите название статьи',
+        ]"
       />
 
       <q-input filled v-model="newTest.description_test" label="Описание" />
@@ -48,6 +46,11 @@
         v-model="newTest.article"
         label="Содержание статьи"
         type="textarea"
+        lazy-rules
+        :rules="[
+          (val) =>
+            (val && val.length > 0) || 'Пожалуйста, введите содержание статьи',
+        ]"
       />
       <div>
         <q-btn
@@ -56,7 +59,12 @@
           color="primary"
           class="q-mr-md"
         />
-        <q-btn label="Сбросить" type="reset" color="secondary" />
+        <q-btn
+          label="Очистить"
+          @click="resetForm"
+          type="reset"
+          color="secondary"
+        />
       </div>
     </q-form>
   </div>
@@ -141,6 +149,7 @@ export default {
       name_test: "",
       description_test: "",
       id_test: currentTest.value,
+      article: "",
     });
     const search = ref("");
 
@@ -154,17 +163,26 @@ export default {
       newTest.value = JSON.parse(JSON.stringify(toRaw(data)));
     }
 
-    function deleteTest(service) {
+    function resetForm() {
+      newTest.value = {
+        name_test: "",
+        description_test: "",
+        id_test: currentTest.value,
+        article: "",
+      };
+      isEdit.value = false;
+    }
+
+    function deleteTest(test) {
       $q.dialog({
         title: "Подтвердить удаление",
-        message: `Вы уверены, что хотите удалить запись "${service.name_test}"?`,
+        message: `Вы уверены, что хотите удалить запись "${test.name_test}"?`,
         cancel: true,
         persistent: true,
       }).onOk(() => {
-        let serv = toRaw(service);
-
+        let test_ = toRaw(test);
         api
-          .delete("/records/tests/")
+          .delete("/records/tests/" + test_.id_test)
           .then((response) => {
             if (response.data) {
               getDataList();
@@ -175,6 +193,11 @@ export default {
           });
       });
     }
+
+    function gotoQuestions(id) {
+      router.push({ path: "/Admin/ListQuestions/" + id });
+    }
+
     function addTest() {
       if (isEdit.value) {
         api
@@ -194,21 +217,30 @@ export default {
             console.log("error");
           });
       } else {
-        api
-          .post("/records/tests", newTest.value)
-          .then((response) => {
-            if (response.data) {
-              getDataList();
-              newTest.value = {
-                name_test: "",
-                description_test: "",
-                id_test: currentTest.value,
-              };
-            }
-          })
-          .catch(() => {
-            console.log("error");
-          });
+        if (newTest.value.name_test != "" && newTest.value.article != "") {
+          console.log("test", newTest.value);
+          api
+            .post("/records/tests", {
+              name_test: newTest.value.name_test,
+              article: newTest.value.article,
+              description_test: newTest.value.description_test,
+              id_section: 0,
+            })
+            .then((response) => {
+              if (response.data) {
+                getDataList();
+                newTest.value = {
+                  name_test: "",
+                  description_test: "",
+                  id_test: currentTest.value,
+                  article: "",
+                };
+              }
+            })
+            .catch(() => {
+              console.log("error");
+            });
+        }
       }
     }
     function getDataList() {
@@ -221,34 +253,8 @@ export default {
         })
         .catch(() => {
           console.log("error");
-          // $q.notify({
-          //     color: 'negative',
-          //     position: 'top',
-          //     message: 'Ошибка загрузки списка установок',
-          //     icon: 'report_problem'
-          // })
         });
     }
-    // function getDataList() {
-    //   api
-    //     .get("/records/tests")
-    //     .then((response) => {
-    //       if (response.data) {
-    //         ListTest.value = response.data.records;
-    //         console.log("getDataList", response.data.records);
-    //         console.log(ListTest.value);
-    //       }
-    //     })
-    //     .catch(() => {
-    //       console.log("error");
-    //       // $q.notify({
-    //       //     color: 'negative',
-    //       //     position: 'top',
-    //       //     message: 'Ошибка загрузки списка установок',
-    //       //     icon: 'report_problem'
-    //       // })
-    //     });
-    // }
 
     return {
       ListTest,
@@ -259,6 +265,8 @@ export default {
       addTest,
       isEdit,
       editTest,
+      gotoQuestions,
+      resetForm,
     };
   },
 };

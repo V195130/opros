@@ -87,6 +87,7 @@ export default {
               response.data?.records[0].password == password.value
             ) {
               //пишем в pinia
+              console.log(response.data?.records[0]);
               userStore.setUser(response.data?.records[0]);
               router.push({ path: "/ListArticles" });
             } else {

@@ -53,6 +53,13 @@
         Вы ответили правильно на {{ nCorrecntAnswers }} из
         {{ unproxiedList.length }} вопросов!
       </div>
+      <div class="q-mt-md text-center">
+        <span
+          @click="gotoSignup('/SignUp')"
+          style="text-decoration: underline; cursor: pointer"
+          >Зарегистрируйтесь</span
+        >, чтобы сохранить результат.
+      </div>
     </div>
   </q-page>
 </template>
@@ -71,7 +78,7 @@ import { useQuasar } from "quasar";
 import { api } from "boot/axios";
 
 export default {
-  name: "UniqArticle",
+  name: "TestingControl",
   props: ["id_test"],
   setup(props) {
     const ListQuestions = ref([]);
@@ -83,6 +90,8 @@ export default {
     const unproxiedList = ref([]);
     const isChecked = ref(false);
     const nCorrecntAnswers = ref(0);
+
+    const router = useRouter();
 
     onMounted(() => {
       getDataTest();
@@ -103,16 +112,35 @@ export default {
               };
             });
           let correct = quests.findIndex((a) => a.is_correct === true);
+          //перемешиваем ответы
+          let shuffleAnswers = shuffleArray(JSON.parse(JSON.stringify(quests)));
           return {
             correct: correct,
-            answers: quests,
+            answers: shuffleAnswers,
             ...x,
           };
         });
         console.log("lt", list_test.value);
-        unproxiedList.value = toRaw(list_test.value);
+        //перемешиваем массив вопросов
+        unproxiedList.value = shuffleArray(toRaw(list_test.value));
       }
     });
+
+    function gotoSignup(path) {
+      router.push(path);
+    }
+
+    function shuffleArray(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        // Получить случайный индекс от 0 до i
+        const j = Math.floor(Math.random() * (i + 1));
+
+        // Поменять элементы местами
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+      return array;
+    }
+
     function prevQuestion() {
       if (currentQuestion.value != 0) {
         currentQuestion.value = currentQuestion.value - 1;
@@ -127,7 +155,7 @@ export default {
 
     function checkAnswers() {
       unproxiedList.value.map((x, i) => {
-        if (x.is_correct == selectedOption.value[i]) {
+        if (x.correct == selectedOption.value[i]) {
           nCorrecntAnswers.value = nCorrecntAnswers.value + 1;
         }
         return x;
@@ -141,7 +169,6 @@ export default {
         .then((response) => {
           if (response.data) {
             ListQuestions.value = response.data.records; //.filter(x => x.id_test == props.id_test)
-            console.log("getDataTest", ListQuestions.value);
           }
         })
         .catch(() => {
@@ -188,6 +215,7 @@ export default {
       checkAnswers,
       nCorrecntAnswers,
       isChecked,
+      gotoSignup,
     };
   },
 };

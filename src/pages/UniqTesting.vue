@@ -58,7 +58,6 @@ export default {
             ...x,
           };
         });
-        console.log("lt", list_test);
       }
     });
     function getDataTest() {
@@ -67,7 +66,6 @@ export default {
         .then((response) => {
           if (response.data) {
             ListQuestions.value = response.data.records; //.filter(x => x.id_test == props.id_test)
-            console.log("getDataTest", ListQuestions.value);
           }
         })
         .catch(() => {
@@ -87,7 +85,6 @@ export default {
         .then((response) => {
           if (response.data) {
             ListAnswers.value = response.data.records;
-            console.log("getDataTest", ListAnswers.value);
           }
         })
         .catch(() => {

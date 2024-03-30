@@ -15,11 +15,16 @@
     virtual-scroll
   >
     <!-- Слот для кастомного отображения ячеек пароля -->
-    <!-- <template v-slot:body-cell-password="props">
+    <template v-slot:body-cell-password="props">
       <q-td :props="props">
         {{ props.row.password.replace(/./g, "*") }}
+        <q-icon
+          name="content_copy"
+          class="cursor-pointer"
+          @click="copyToClipboard(props.row.password)"
+        />
       </q-td>
-    </template> -->
+    </template>
     <!-- Слот для кастомизации действий -->
     <template v-slot:body-cell-actions="props">
       <q-td :props="props">
@@ -84,14 +89,16 @@ import {
 import { useRouter } from "vue-router";
 import { useQuasar } from "quasar";
 import { api } from "boot/axios";
+import useClipboard from "vue-clipboard3";
 
 export default {
   name: "ListLogins",
-  setup() {
+  props: ["id_user"],
+  setup(props) {
     const router = useRouter();
-    const currentUser = ref(2);
     const ListLogins = ref([]);
     const isEdit = ref(false);
+    const { toClipboard } = useClipboard();
     const columns = ref([
       {
         name: "service_name",
@@ -128,12 +135,50 @@ export default {
       login: "",
       password: "",
       comment: "",
-      id_user: currentUser.value,
+      id_user: props.id_user,
     });
     const search = ref("");
 
     onMounted(() => {
       getDataList();
+    });
+
+    let timeout;
+    watchEffect(() => {
+      if (search.value) {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => {
+          // Здесь выполняется ваш поисковый запрос.
+          // Вместо console.log ставите вызов функции поиска
+          console.log("Search:", search.value);
+          api
+            .get(
+              "/records/logins?filter=id_user,eq," +
+                props.id_user +
+                "&filter1=service_name,cs," +
+                search.value +
+                "&filter2=login,cs," +
+                search.value +
+                "&filter=comment,cs," +
+                search.value
+            )
+            .then((response) => {
+              if (response.data) {
+                ListLogins.value = response.data.records;
+              }
+            })
+            .catch(() => {
+              console.log("error");
+              // $q.notify({
+              //     color: 'negative',
+              //     position: 'top',
+              //     message: 'Ошибка загрузки списка установок',
+              //     icon: 'report_problem'
+              // })
+            });
+          console.log("search", response.data.records);
+        }, 500); // Задержка в 500 мс
+      }
     });
 
     function editService(data) {
@@ -175,7 +220,7 @@ export default {
                 login: "",
                 password: "",
                 comment: "",
-                id_user: currentUser.value,
+                id_user: props.id_user,
               };
               isEdit.value = false;
             }
@@ -194,7 +239,7 @@ export default {
                 login: "",
                 password: "",
                 comment: "",
-                id_user: currentUser.value,
+                id_user: props.id_user,
               };
             }
           })
@@ -206,22 +251,33 @@ export default {
 
     function getDataList() {
       api
-        .get("/records/logins?filter=id_user,eq," + currentUser.value)
+        .get("/records/logins?filter=id_user,eq," + props.id_user)
         .then((response) => {
           if (response.data) {
             ListLogins.value = response.data.records;
-            console.log("getDataList", response.data.records);
           }
         })
         .catch(() => {
           console.log("error");
-          // $q.notify({
-          //     color: 'negative',
-          //     position: 'top',
-          //     message: 'Ошибка загрузки списка установок',
-          //     icon: 'report_problem'
-          // })
+          $q.notify({
+            color: "negative",
+            position: "top",
+            message: "Ошибка загрузки списка",
+            icon: "report_problem",
+          });
         });
+    }
+    async function copyToClipboard(text) {
+      try {
+        await toClipboard(text);
+        $q.notify({
+          color: "green",
+          position: "top",
+          message: "Пароль скопирован в буфер обмена",
+        });
+      } catch (e) {
+        console.error(e);
+      }
     }
 
     return {
@@ -233,6 +289,7 @@ export default {
       addService,
       isEdit,
       editService,
+      copyToClipboard,
     };
   },
 };

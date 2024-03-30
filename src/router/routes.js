@@ -69,12 +69,22 @@ const routes = [
         component: () => import("pages/ListArticles.vue"),
       },
       {
-        path: "/Admin/ListLogins",
+        path: "/Admin/ListLogins/:id_user",
+        props: true,
         component: () => import("pages/Admin/ListLogins.vue"),
+      },
+      {
+        path: "/Admin/ListQuestions/:id_test",
+        props: true,
+        component: () => import("pages/Admin/ListQuestions.vue"),
       },
       {
         path: "/Admin/AdminArticles",
         component: () => import("pages/Admin/AdminArticles.vue"),
+      },
+      {
+        path: "/SignUp",
+        component: () => import("pages/SignUp.vue"),
       },
       { path: "/LoginUser", component: () => import("pages/LoginUser.vue") },
       { path: "/AboutMe", component: () => import("pages/AboutMe.vue") },

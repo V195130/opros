@@ -37,8 +37,18 @@
         <q-route-tab to="/ListArticles" label="статьи" />
         <q-route-tab to="/UniqTesting/1" label="Тестирование" />
         <q-route-tab to="/AboutMe" label="Об Авторе" />
-        <q-route-tab :to="'/Admin/ListLogins/' + id_user" label="Записи" />
-        <q-route-tab to="/Admin/AdminArticles" label="Статьи" />
+        <q-route-tab
+          v-if="userLogin"
+          :to="'/Admin/ListLogins/' + id_user"
+          label="Заметки"
+          style="color: #0000ff"
+        />
+        <q-route-tab
+          v-if="role_user === 'admin'"
+          to="/Admin/AdminArticles"
+          label="Статьи"
+          style="color: #0000ff"
+        />
       </q-tabs>
     </q-header>
 
@@ -64,7 +74,7 @@ export default {
 
     const userLogin = computed(() => userStore.login || null);
     const id_user = computed(() => userStore.id_user || null);
-    const isAdmin = computed(() => userStore.role == "admin");
+    const role_user = computed(() => userStore.role || null);
 
     function logout() {
       console.log("выход");
@@ -87,7 +97,7 @@ export default {
       userLogin,
       id_user,
       logout,
-      isAdmin,
+      role_user,
     };
   },
 };

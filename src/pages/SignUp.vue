@@ -71,7 +71,7 @@
 
 <script>
 export default {
-  name: "RegistrationForm",
+  name: "SignUp",
   data() {
     return {
       name: "",
