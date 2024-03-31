@@ -2,21 +2,23 @@
   <q-layout view="hHh lpR fFf">
     <q-header elevated class="bg-primary text-white" height-hint="98">
       <q-toolbar>
-        <q-toolbar-title>
+        <q-toolbar-title @click="openpath('/')">
           <q-avatar>
-            <img src="https://cdn.quasar.dev/logo-v2/svg/logo-mono-white.svg" />
+            <img
+              style="height: 40px"
+              src="https://yt3.googleusercontent.com/FxcDtD2QUqbeI5c11PJD5shgUPOK_zahi3ebXHOjqV8WONAmUgTRR6nIwTitd1kezpARtcIvvT4=s900-c-k-c0x00ffffff-no-rj"
+            />
           </q-avatar>
           Информационные технологии
         </q-toolbar-title>
         <div v-if="userLogin != null">
           {{ userLogin }}, <br /><span @click="logout()"> Выйти</span>
         </div>
-        <div v-else>
+        <div v-if="!userLogin">
           <q-btn
-            label="Зарегистрируйтесь"
-            color="primary"
-            flat
-            class="q-ml-md"
+            :color="!$q.dark.isActive ? 'primary' : 'orange'"
+            icon="person_add"
+            @click="openpath('/SignUp')"
           />
         </div>
 
@@ -29,13 +31,13 @@
           v-if="!userLogin"
           icon="settings"
           flat
-          @click="openLoginDialog()"
+          @click="openpath('/LoginUser')"
         />
       </q-toolbar>
 
       <q-tabs align="left">
         <q-route-tab to="/ListArticles" label="статьи" />
-        <q-route-tab to="/UniqTesting/1" label="Тестирование" />
+        <q-route-tab to="/UniqTesting/1" label="Полезные ресурсы" />
         <q-route-tab to="/AboutMe" label="Об Авторе" />
         <q-route-tab
           v-if="userLogin"
@@ -45,8 +47,26 @@
         />
         <q-route-tab
           v-if="role_user === 'admin'"
+          to="/Admin/Listsections"
+          label="Разделы"
+          style="color: #0000ff"
+        />
+        <q-route-tab
+          v-if="role_user === 'admin'"
           to="/Admin/AdminArticles"
           label="Статьи"
+          style="color: #0000ff"
+        />
+        <q-route-tab
+          v-if="role_user === 'admin'"
+          to="/Admin/AdminArticles"
+          label="Пользователи"
+          style="color: #0000ff"
+        />
+        <q-route-tab
+          v-if="userLogin"
+          to="/Admin/AdminArticles"
+          label="Результаты"
           style="color: #0000ff"
         />
       </q-tabs>
@@ -86,14 +106,14 @@ export default {
       $q.dark.toggle();
     }
 
-    function openLoginDialog() {
-      router.push({ path: "/LoginUser" });
+    function openpath(str) {
+      router.push({ path: str });
     }
 
     return {
       toggleTheme,
       currentTheme,
-      openLoginDialog,
+      openpath,
       userLogin,
       id_user,
       logout,

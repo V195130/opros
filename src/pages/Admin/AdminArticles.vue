@@ -40,6 +40,26 @@
         ]"
       />
 
+      <q-select
+        filled
+        :model-value="newTest.id_section"
+        label="Выберите раздел"
+        :options="ListSections"
+        option-value="id_section"
+        option-label="name_section"
+        @update:model-value="
+          (value) => {
+            newTest.id_section = value;
+          }
+        "
+        required
+        :rules="[
+          (val) =>
+            (val !== null && val !== undefined) ||
+            'Пожалуйста, выберите раздел',
+        ]"
+      />
+
       <q-input filled v-model="newTest.description_test" label="Описание" />
       <q-input
         filled
@@ -90,6 +110,7 @@ export default {
     const router = useRouter();
     const currentTest = ref(2);
     const ListTest = ref([]);
+    const ListSections = ref([]);
     const isEdit = ref(false);
     const columns = ref([
       {
@@ -98,6 +119,14 @@ export default {
         label: "Название статьи",
         align: "left",
         field: "name_test",
+        sortable: true,
+      },
+      {
+        name: "name_section",
+        required: true,
+        label: "Раздел",
+        align: "left",
+        field: "name_section",
         sortable: true,
       },
       {
@@ -114,51 +143,24 @@ export default {
         sortable: false,
       },
     ]);
-    // const columns = ref([
-    //   {
-    //     name: "service_name",
-    //     required: true,
-    //     label: "Сервис",
-    //     align: "left",
-    //     field: "service_name",
-    //     sortable: true,
-    //   },
-    //   {
-    //     name: "login",
-    //     align: "left",
-    //     label: "Логин",
-    //     field: "login",
-    //     sortable: true,
-    //   },
-    //   { name: "password", label: "Пароль", field: "password" },
-    //   {
-    //     name: "comment",
-    //     label: "Комментарий",
-    //     field: "comment",
-    //     sortable: true,
-    //   },
-    //   {
-    //     name: "actions",
-    //     label: "Действия",
-    //     field: "actions",
-    //     sortable: false,
-    //   },
-    // ]);
+
     const $q = useQuasar();
     const newTest = ref({
       name_test: "",
       description_test: "",
       id_test: currentTest.value,
+      id_section: null,
       article: "",
     });
     const search = ref("");
 
     onMounted(() => {
+      getDataSections();
+      setTimeout(() => {}, 500);
       getDataList();
     });
 
     function editTest(data) {
-      console.log("editTest", data);
       isEdit.value = true;
       newTest.value = JSON.parse(JSON.stringify(toRaw(data)));
     }
@@ -200,6 +202,8 @@ export default {
 
     function addTest() {
       if (isEdit.value) {
+        let id_section = newTest.value.id_section.id_section;
+        newTest.value.id_section = id_section;
         api
           .put("/records/tests/" + newTest.value.id_test, newTest.value)
           .then((response) => {
@@ -209,22 +213,22 @@ export default {
                 name_test: "",
                 description_test: "",
                 id_test: currentTest.value,
+                id_section: null,
               };
               isEdit.value = false;
             }
           })
           .catch(() => {
-            console.log("error");
+            console.log("error Edit test");
           });
       } else {
         if (newTest.value.name_test != "" && newTest.value.article != "") {
-          console.log("test", newTest.value);
           api
             .post("/records/tests", {
               name_test: newTest.value.name_test,
               article: newTest.value.article,
               description_test: newTest.value.description_test,
-              id_section: 0,
+              id_section: newTest.value.id_section.id_section,
             })
             .then((response) => {
               if (response.data) {
@@ -234,11 +238,12 @@ export default {
                   description_test: "",
                   id_test: currentTest.value,
                   article: "",
+                  id_section: null,
                 };
               }
             })
             .catch(() => {
-              console.log("error");
+              console.log("error add test");
             });
         }
       }
@@ -248,11 +253,41 @@ export default {
         .get("/records/tests")
         .then((response) => {
           if (response.data) {
-            ListTest.value = response.data.records;
+            let List = toRaw(response.data.records);
+            ListTest.value = List.map((x) => {
+              let name_s =
+                ListSections.value.filter(
+                  (s) => s.id_section == x.id_section
+                )[0].name_section || "";
+              let t = {
+                name_section: name_s,
+                article: x.article,
+                description_test: x.description_test,
+                id_section: x.id_section,
+                id_test: x.id_test,
+                name_test: x.name_test,
+              };
+              return t;
+            });
           }
         })
         .catch(() => {
-          console.log("error");
+          console.log("error list tests");
+        });
+    }
+
+    function getDataSections() {
+      api
+        .get("/records/sections")
+        .then((response) => {
+          if (response.data) {
+            ListSections.value = JSON.parse(
+              JSON.stringify(toRaw(response.data.records))
+            );
+          }
+        })
+        .catch(() => {
+          console.log("error list sections");
         });
     }
 
@@ -267,6 +302,7 @@ export default {
       editTest,
       gotoQuestions,
       resetForm,
+      ListSections,
     };
   },
 };

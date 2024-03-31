@@ -1,19 +1,24 @@
 <template>
   <q-page>
-    <div
-      v-for="(l, index) in ListTests"
-      :key="index"
-      class="q-ml-md q-mt-md"
-      :class="!$q.dark.isActive ? 'lightstyle-a' : 'darkstyle-a'"
-      @click="GoToPath(l)"
-    >
-      {{ l.name_test }}
+    <div v-for="(s, i) in ListSections" :key="'s' + i" class="q-ml-md q-mt-md">
+      <span style="font-size: 22px">{{ s.name_section }}</span>
+      <div
+        v-for="(l, index) in ListTests.filter(
+          (x) => x.id_section == s.id_section
+        )"
+        :key="'t' + index"
+        class="q-ml-md q-mt-md"
+        :class="!$q.dark.isActive ? 'lightstyle-a' : 'darkstyle-a'"
+        @click="GoToPath(l)"
+      >
+        {{ l.name_test }}
+      </div>
     </div>
   </q-page>
 </template>
 
 <script>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, toRaw } from "vue";
 import { useRouter } from "vue-router";
 import { useQuasar } from "quasar";
 import { api } from "boot/axios";
@@ -38,6 +43,8 @@ export default {
       { name: "Статья", url: "UniqArticle" },
     ]);
 
+    const ListSections = ref([]);
+
     function clickPath(l) {
       router.push({ path: "/Articles/" + l.url });
     }
@@ -47,6 +54,7 @@ export default {
 
     onMounted(() => {
       getDataTest();
+      getListSections();
     });
 
     function getDataTest() {
@@ -54,25 +62,33 @@ export default {
         .get("/records/tests")
         .then((response) => {
           if (response.data) {
-            ListTests.value = response.data.records;
+            ListTests.value = toRaw(response.data.records);
           }
         })
         .catch(() => {
           console.log("error");
-          // $q.notify({
-          //     color: 'negative',
-          //     position: 'top',
-          //     message: 'Ошибка загрузки списка установок',
-          //     icon: 'report_problem'
-          // })
         });
     }
 
+    function getListSections() {
+      api
+        .get("/records/sections")
+        .then((response) => {
+          if (response.data) {
+            ListSections.value = toRaw(response.data.records);
+            console.log("get", ListSections.value);
+          }
+        })
+        .catch(() => {
+          console.log("error");
+        });
+    }
     return {
       ListArticles,
       clickPath,
       currentTheme,
       ListTests,
+      ListSections,
       GoToPath,
     };
   },

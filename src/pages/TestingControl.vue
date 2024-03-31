@@ -53,7 +53,7 @@
         Вы ответили правильно на {{ nCorrecntAnswers }} из
         {{ unproxiedList.length }} вопросов!
       </div>
-      <div class="q-mt-md text-center">
+      <div class="q-mt-md text-center" v-if="!userLogin">
         <span
           @click="gotoSignup('/SignUp')"
           style="text-decoration: underline; cursor: pointer"
@@ -76,6 +76,8 @@ import {
 import { useRouter } from "vue-router";
 import { useQuasar } from "quasar";
 import { api } from "boot/axios";
+import { useUserStore } from "stores/userStore";
+import NoWorkResult from "postcss/lib/no-work-result";
 
 export default {
   name: "TestingControl",
@@ -91,12 +93,35 @@ export default {
     const isChecked = ref(false);
     const nCorrecntAnswers = ref(0);
 
+    const userStore = useUserStore();
+
+    const userLogin = computed(() => userStore.login || null);
+    const id_user = computed(() => userStore.id_user || null);
+
     const router = useRouter();
 
     onMounted(() => {
       getDataTest();
       getAnswers();
     });
+
+    //TODO сделать сохранение результутатов теста в базу
+    // добавить таблицу results с полями
+    // id_result : ai, int, primary
+    // id_user int
+    // id_test int
+    // result - int
+    // date_test - дата и время
+
+    function saveResultUser() {
+      let result = {
+        id_user: id_user.value,
+        id_test: props.id_test,
+        result: nCorrecntAnswers.value,
+        date: new Date(),
+      };
+      //TODO сохранение result в таблицу results
+    }
 
     watchEffect(() => {
       if (ListQuestions.value.length && ListAnswers.value.length) {
@@ -161,6 +186,9 @@ export default {
         return x;
       });
       isChecked.value = true;
+      if (userLogin.value) {
+        saveResultUser();
+      }
     }
 
     function getDataTest() {
@@ -216,6 +244,7 @@ export default {
       nCorrecntAnswers,
       isChecked,
       gotoSignup,
+      userLogin,
     };
   },
 };

@@ -68,30 +68,49 @@
     </q-card>
   </q-page>
 </template>
-
 <script>
+import {
+  ref,
+  onMounted,
+  toRefs,
+  defineProps,
+  watchEffect,
+  computed,
+  toRaw,
+} from "vue";
+import { useRouter } from "vue-router";
+import { useQuasar } from "quasar";
+import { api } from "boot/axios";
+import { useUserStore } from "stores/userStore";
+
 export default {
   name: "SignUp",
-  data() {
-    return {
-      name: "",
-      email: "",
-      password: "",
-      confirmPassword: "",
-    };
-  },
-  methods: {
-    onSubmit() {
-      // Обрабатываем данные формы
-      console.log("Регистрация:", this.name, this.email, this.password);
-      // Здесь должен быть ваш метод регистрации, например API-запрос
-    },
-    onReset() {
-      this.name = "";
-      this.email = "";
-      this.password = "";
-      this.confirmPassword = "";
-    },
-  },
+  setup() {},
 };
+
+// <script>
+// export default {
+//   name: "SignUp",
+//   data() {
+//     return {
+//       name: "",
+//       email: "",
+//       password: "",
+//       confirmPassword: "",
+//     };
+//   },
+//   methods: {
+//     onSubmit() {
+//       // Обрабатываем данные формы
+//       console.log("Регистрация:", this.name, this.email, this.password);
+//       // Здесь должен быть ваш метод регистрации, например API-запрос
+//     },
+//     onReset() {
+//       this.name = "";
+//       this.email = "";
+//       this.password = "";
+//       this.confirmPassword = "";
+//     },
+//   },
+// };
 </script>

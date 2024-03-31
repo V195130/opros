@@ -1,7 +1,9 @@
 <template>
   <q-page class="">
-    <div style="margin-top: 500px">
-      <h3>.</h3>
+    <div style="margin-top: 10px; margin-bottom: 40px">
+      <img
+        src="https://copyassignment.com/wp-content/uploads/2022/11/JavaScript.jpg"
+      />
     </div>
     <img
       v-for="(img, i) in img_list"

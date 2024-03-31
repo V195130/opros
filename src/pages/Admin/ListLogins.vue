@@ -69,6 +69,7 @@
           :label="isEdit ? 'Изменить' : 'Добавить'"
           @click="addService()"
           color="primary"
+          class="q-mr-md"
         />
         <q-btn label="Сбросить" type="reset" color="secondary" />
       </div>
@@ -148,9 +149,6 @@ export default {
       if (search.value) {
         clearTimeout(timeout);
         timeout = setTimeout(() => {
-          // Здесь выполняется ваш поисковый запрос.
-          // Вместо console.log ставите вызов функции поиска
-          console.log("Search:", search.value);
           api
             .get(
               "/records/logins?filter=id_user,eq," +
@@ -168,21 +166,13 @@ export default {
               }
             })
             .catch(() => {
-              console.log("error");
-              // $q.notify({
-              //     color: 'negative',
-              //     position: 'top',
-              //     message: 'Ошибка загрузки списка установок',
-              //     icon: 'report_problem'
-              // })
+              console.log("error search");
             });
-          console.log("search", response.data.records);
         }, 500); // Задержка в 500 мс
       }
     });
 
     function editService(data) {
-      console.log("editService", data);
       isEdit.value = true;
       newService.value = JSON.parse(JSON.stringify(toRaw(data)));
     }

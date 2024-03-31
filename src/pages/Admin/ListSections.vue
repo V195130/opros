@@ -1,7 +1,7 @@
 <template>
   <q-table
-    title="Список вопросов"
-    :rows="ListQuestions"
+    title="Список Разделов"
+    :rows="Listsections"
     :columns="columns"
     row-key="id"
     flat
@@ -10,39 +10,34 @@
   >
     <template v-slot:body-cell-actions="props">
       <q-td :props="props">
-        <q-btn
-          flat
-          icon="edit"
-          color="green"
-          @click="editQuestions(props.row)"
-        />
+        <q-btn flat icon="edit" color="green" @click="editSection(props.row)" />
         <q-btn
           flat
           icon="delete"
           color="red"
-          @click="deleteQuestions(props.row)"
+          @click="deletesection(props.row)"
         />
       </q-td>
     </template>
   </q-table>
   <div class="flex flex-center q-mt-md">
     <q-form
-      @submit="addQuestion()"
+      @submit="addsection()"
       @reset="resetForm"
       class="q-gutter-md"
       style="width: 400px"
     >
       <q-input
         filled
-        v-model="newQuestion.question_text"
-        label="Текст вопроса"
+        v-model="newsection.name_section"
+        label="Название Раздела"
         required
       />
 
       <div>
         <q-btn
           :label="isEdit ? 'Изменить' : 'Добавить'"
-          @click="addQuestion()"
+          @click="addsection()"
           color="primary"
           class="q-mr-md"
         />
@@ -65,24 +60,24 @@ import {
 import { useRouter } from "vue-router";
 import { useQuasar } from "quasar";
 import { api } from "boot/axios";
-import useClipboard from "vue-clipboard3";
 
 export default {
-  name: "ListQuestions",
-  props: ["id_test"],
-  setup(props) {
+  name: "ListSections",
+  setup() {
     const router = useRouter();
-    const ListQuestions = ref([]);
+    const Listsections = ref([]);
     const isEdit = ref(false);
+
     const columns = ref([
       {
-        name: "question_text",
+        name: "name_section",
         required: true,
-        label: "Вопрос",
+        label: "Сервис",
         align: "left",
-        field: "question_text",
+        field: "name_section",
         sortable: true,
       },
+
       {
         name: "actions",
         label: "Действия",
@@ -91,34 +86,31 @@ export default {
       },
     ]);
     const $q = useQuasar();
-    const search = ref("");
-
-    const newQuestion = ref({
-      question_text: "",
-      id_test: props.id_test,
+    const newsection = ref({
+      name_section: "",
     });
+    const search = ref("");
 
     onMounted(() => {
       getDataList();
     });
 
-    function editQuestions(data) {
-      console.log("editQuestions", data);
+    function editSection(data) {
       isEdit.value = true;
-      newQuestion.value = JSON.parse(JSON.stringify(toRaw(data)));
+      newsection.value = JSON.parse(JSON.stringify(toRaw(data)));
     }
 
-    function deleteQuestions(Question) {
+    function deletesection(section) {
       $q.dialog({
         title: "Подтвердить удаление",
-        message: `Вы уверены, что хотите удалить запись "${Question.question_text}"?`,
+        message: `Вы уверены, что хотите удалить запись "${section.name_section}"?`,
         cancel: true,
         persistent: true,
       }).onOk(() => {
-        let Quest = toRaw(Question);
+        let sect = toRaw(section);
 
         api
-          .delete("/records/questions/" + Quest.id_question)
+          .delete("/records/sections/" + sect.id_section)
           .then((response) => {
             if (response.data) {
               getDataList();
@@ -129,18 +121,18 @@ export default {
           });
       });
     }
-    function addQuestion() {
+    function addsection() {
       if (isEdit.value) {
         api
           .put(
-            "/records/questions/" + newQuestion.value.id_question,
-            newQuestion.value
+            "/records/sections/" + newsection.value.id_section,
+            newsection.value
           )
           .then((response) => {
             if (response.data) {
               getDataList();
-              newQuestion.value = {
-                question_text: "",
+              newsection.value = {
+                name_section: "",
               };
               isEdit.value = false;
             }
@@ -150,12 +142,12 @@ export default {
           });
       } else {
         api
-          .post("/records/questions", newQuestion.value)
+          .post("/records/sections", newsection.value)
           .then((response) => {
             if (response.data) {
               getDataList();
-              newQuestion.value = {
-                question_text: "",
+              newsection.value = {
+                name_sections: "",
               };
             }
           })
@@ -164,12 +156,13 @@ export default {
           });
       }
     }
+
     function getDataList() {
       api
-        .get("/records/questions?filter=id_test,eq," + props.id_test)
+        .get("/records/sections")
         .then((response) => {
           if (response.data) {
-            ListQuestions.value = response.data.records;
+            Listsections.value = response.data.records;
           }
         })
         .catch(() => {
@@ -184,13 +177,14 @@ export default {
     }
 
     return {
-      ListQuestions,
+      Listsections,
       columns,
-      newQuestion,
-      deleteQuestions,
-      addQuestion,
+      search,
+      newsection,
+      deletesection,
+      addsection,
       isEdit,
-      editQuestions,
+      editSection,
     };
   },
 };

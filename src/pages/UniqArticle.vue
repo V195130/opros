@@ -1,19 +1,20 @@
 <template>
   <div class="q-ml-md q-mt-md">
+    <h4>{{ ArticleName }}</h4>
     <q-btn
+      v-if="ListQuestions"
       class="q-ml-md q-mt-md"
       color="primary"
       label="Тренировочный тест"
       @click="navigate('/UniqTesting/' + id_test)"
     />
     <q-btn
+      v-if="ListQuestions"
       class="q-ml-md q-mt-md"
       color="red"
       label="Пройти тест"
       @click="navigate('/TestingControl/' + id_test)"
     />
-
-    <h4>{{ ArticleName }}</h4>
     <div v-html="ArticleText"></div>
   </div>
 </template>
@@ -30,6 +31,7 @@ export default {
   setup(props) {
     const ArticleText = ref(null);
     const ArticleName = ref("");
+    const ListQuestions = ref(0);
     const router = useRouter();
     function navigate(path) {
       router.push(path);
@@ -37,6 +39,7 @@ export default {
 
     onMounted(() => {
       getDataTest();
+      getListQuestions();
     });
     function getDataTest() {
       api
@@ -61,11 +64,30 @@ export default {
           // })
         });
     }
+    function getListQuestions() {
+      api
+        .get("/records/questions?filter=id_test,eq," + props.id_test)
+        .then((response) => {
+          if (response.data) {
+            ListQuestions.value = response.data.records.length;
+          }
+        })
+        .catch(() => {
+          console.log("error");
+          $q.notify({
+            color: "negative",
+            position: "top",
+            message: "Ошибка загрузки списка",
+            icon: "report_problem",
+          });
+        });
+    }
     return {
       getDataTest,
       ArticleText,
       ArticleName,
       navigate,
+      ListQuestions,
     };
   },
 };
