@@ -83,6 +83,7 @@ export default {
   name: "TestingControl",
   props: ["id_test"],
   setup(props) {
+    const $q = useQuasar();
     const ListQuestions = ref([]);
     const ListAnswers = ref([]);
     const list_test = ref([]);
@@ -114,13 +115,25 @@ export default {
     // date_test - дата и время
 
     function saveResultUser() {
-      let result = {
+      let new_result = {
         id_user: id_user.value,
         id_test: props.id_test,
         result: nCorrecntAnswers.value,
-        date: new Date(),
       };
-      //TODO сохранение result в таблицу results
+      api
+        .post("/records/results", new_result)
+        .then((response) => {
+          if (response.data) {
+            $q.notify({
+              color: "green",
+              position: "top",
+              message: "Ваш результат сохранен",
+            });
+          }
+        })
+        .catch(() => {
+          console.log("error add test");
+        });
     }
 
     watchEffect(() => {
@@ -145,7 +158,6 @@ export default {
             ...x,
           };
         });
-        console.log("lt", list_test.value);
         //перемешиваем массив вопросов
         unproxiedList.value = shuffleArray(toRaw(list_test.value));
       }
@@ -201,12 +213,6 @@ export default {
         })
         .catch(() => {
           console.log("error");
-          // $q.notify({
-          //     color: 'negative',
-          //     position: 'top',
-          //     message: 'Ошибка загрузки списка установок',
-          //     icon: 'report_problem'
-          // })
         });
     }
 
@@ -216,17 +222,10 @@ export default {
         .then((response) => {
           if (response.data) {
             ListAnswers.value = response.data.records;
-            console.log("getAnswers", ListAnswers.value);
           }
         })
         .catch(() => {
           console.log("error");
-          // $q.notify({
-          //     color: 'negative',
-          //     position: 'top',
-          //     message: 'Ошибка загрузки списка установок',
-          //     icon: 'report_problem'
-          // })
         });
     }
     return {
