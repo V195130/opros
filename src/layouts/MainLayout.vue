@@ -37,7 +37,7 @@
 
       <q-tabs align="left">
         <q-route-tab to="/ListArticles" label="статьи" />
-        <q-route-tab to="/UniqTesting/1" label="Полезные ресурсы" />
+        <q-route-tab to="/ListURL" label="Полезные ресурсы" />
         <q-route-tab to="/AboutMe" label="Об Авторе" />
         <q-route-tab
           v-if="userLogin"
@@ -59,13 +59,13 @@
         />
         <q-route-tab
           v-if="role_user === 'admin'"
-          to="/Admin/AdminArticles"
+          to="/Admin/AdminUsers"
           label="Пользователи"
           style="color: #0000ff"
         />
         <q-route-tab
           v-if="userLogin"
-          to="/Admin/AdminArticles"
+          :to="'/Admin/ListResults/' + id_user"
           label="Результаты"
           style="color: #0000ff"
         />

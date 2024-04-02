@@ -1,6 +1,5 @@
 <template>
   <div class="q-ml-md q-mt-md">
-    <h4>{{ ArticleName }}</h4>
     <q-btn
       v-if="ListQuestions"
       class="q-ml-md q-mt-md"

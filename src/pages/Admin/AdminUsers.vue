@@ -9,7 +9,22 @@
     virtual-scroll
   >
     <template v-slot:body-cell-actions="props">
-      <q-btn flat icon="delete" color="red" @click="deleteuser(props.row)" />
+      <q-td :props="props">
+        <q-btn
+          flat
+          icon="list"
+          title="Результаты"
+          color="green"
+          @click="gotoResults(props.row.id_user)"
+        />
+        <q-btn
+          flat
+          icon="delete"
+          title="Удалить"
+          color="red"
+          @click="deleteuser(props.row)"
+        />
+      </q-td>
     </template>
   </q-table>
 </template>
@@ -32,17 +47,41 @@ export default {
   name: "AdminArticle",
   setup() {
     const router = useRouter();
-    const currentusers = ref(2);
+    const currentuser = ref(2);
     const Listusers = ref([]);
     const ListSections = ref([]);
     const isEdit = ref(false);
     const columns = ref([
       {
-        name: "name_test",
+        name: "name",
         required: true,
-        label: "Название статьи",
+        label: "Имя",
         align: "left",
-        field: "name_test",
+        field: "name",
+        sortable: true,
+      },
+      {
+        name: "family",
+        required: true,
+        label: "Фамилия",
+        align: "left",
+        field: "family",
+        sortable: true,
+      },
+      {
+        name: "role",
+        required: true,
+        label: "Права",
+        align: "left",
+        field: "role",
+        sortable: true,
+      },
+      {
+        name: "login",
+        required: true,
+        label: "Никнейм",
+        align: "left",
+        field: "login",
         sortable: true,
       },
       {
@@ -54,31 +93,21 @@ export default {
     ]);
 
     const $q = useQuasar();
-    const newusers = ref({
-      name_test: "",
-      description_test: "",
-      id_test: currentTest.value,
-      id_section: null,
-      article: "",
-    });
-    const search = ref("");
 
     onMounted(() => {
-      getDataSections();
       setTimeout(() => {}, 500);
       getDataList();
     });
 
-    function deleteuser(users) {
+    function deleteuser(user) {
       $q.dialog({
         title: "Подтвердить удаление",
-        message: `Вы уверены, что хотите удалить запись "${users.name}"?`,
+        message: `Вы уверены, что хотите удалить запись "${user.name}"?`,
         cancel: true,
         persistent: true,
       }).onOk(() => {
-        let user = toRaw(test);
         api
-          .delete("/records/users/" + test_.id_test)
+          .delete("/records/users/" + user.id_user)
           .then((response) => {
             if (response.data) {
               getDataList();
@@ -91,30 +120,15 @@ export default {
     }
 
     function gotoResults(id) {
-      //router.push({ path: "/Admin/ListResults/" + id });
+      router.push({ path: "/Admin/ListResults/" + id });
     }
 
     function getDataList() {
       api
-        .get("/records/tests")
+        .get("/records/users")
         .then((response) => {
           if (response.data) {
-            let List = toRaw(response.data.records);
-            ListTest.value = List.map((x) => {
-              let name_s =
-                ListSections.value.filter(
-                  (s) => s.id_section == x.id_section
-                )[0].name_section || "";
-              let t = {
-                name_section: name_s,
-                article: x.article,
-                description_test: x.description_test,
-                id_section: x.id_section,
-                id_test: x.id_test,
-                name_test: x.name_test,
-              };
-              return t;
-            });
+            Listusers.value = toRaw(response.data.records);
           }
         })
         .catch(() => {
@@ -122,26 +136,9 @@ export default {
         });
     }
 
-    function getDataSections() {
-      api
-        .get("/records/sections")
-        .then((response) => {
-          if (response.data) {
-            ListSections.value = JSON.parse(
-              JSON.stringify(toRaw(response.data.records))
-            );
-          }
-        })
-        .catch(() => {
-          console.log("error list sections");
-        });
-    }
-
     return {
-      ListTest,
+      Listusers,
       columns,
-      search,
-      newusers,
       deleteuser,
       gotoResults,
     };

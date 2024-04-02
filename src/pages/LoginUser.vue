@@ -76,7 +76,6 @@ export default {
     const userStore = useUserStore();
 
     function onSubmit() {
-      console.log("Вход:", name.value, password.value);
       api
         .get("/records/users?filter=login,eq," + name.value)
         .then((response) => {

@@ -9,7 +9,7 @@
         <q-form @submit="onSubmit" @reset="onReset" class="q-gutter-md">
           <q-input
             filled
-            v-model="name"
+            v-model="user.login"
             label="Имя пользователя"
             lazy-rules
             :rules="[
@@ -19,21 +19,13 @@
             ]"
           />
 
-          <q-input
-            filled
-            v-model="email"
-            label="Email"
-            lazy-rules
-            :rules="[
-              (val) => (val && val.length > 0) || 'Пожалуйста, введите email',
-              (val) =>
-                /.+@.+..+/.test(val) || 'Пожалуйста, введите корректный email',
-            ]"
-          />
+          <q-input filled v-model="user.family" label="Фамилия" />
+
+          <q-input filled v-model="user.name" label="Имя" />
 
           <q-input
             filled
-            v-model="password"
+            v-model="user.password"
             type="password"
             label="Пароль"
             lazy-rules
@@ -46,15 +38,15 @@
 
           <q-input
             filled
-            v-model="confirmPassword"
+            v-model="user.confirmPassword"
             type="password"
             label="Подтвердите пароль"
             lazy-rules
-            :rules="[(val) => val === password || 'Пароли не совпадают']"
+            :rules="[(val) => val === user.password || 'Пароли не совпадают']"
           />
 
           <div>
-            <q-btn label="Регистрация" type="submit" color="primary" />
+            <q-btn label="Регистрация" @click="AddUser()" color="primary" />
             <q-btn
               label="Очистить"
               type="reset"
@@ -68,6 +60,7 @@
     </q-card>
   </q-page>
 </template>
+
 <script>
 import {
   ref,
@@ -85,32 +78,46 @@ import { useUserStore } from "stores/userStore";
 
 export default {
   name: "SignUp",
-  setup() {},
-};
+  setup() {
+    const router = useRouter();
+    const user = ref({
+      login: "",
+      family: "",
+      name: "",
+      role: "user",
+      password: "",
+      confirmPassword: "",
+    });
 
-// <script>
-// export default {
-//   name: "SignUp",
-//   data() {
-//     return {
-//       name: "",
-//       email: "",
-//       password: "",
-//       confirmPassword: "",
-//     };
-//   },
-//   methods: {
-//     onSubmit() {
-//       // Обрабатываем данные формы
-//       console.log("Регистрация:", this.name, this.email, this.password);
-//       // Здесь должен быть ваш метод регистрации, например API-запрос
-//     },
-//     onReset() {
-//       this.name = "";
-//       this.email = "";
-//       this.password = "";
-//       this.confirmPassword = "";
-//     },
-//   },
-// };
+    function AddUser() {
+      let u = {
+        login: user.value.login,
+        family: user.value.family,
+        name: user.value.name,
+        role: user.value.role,
+        password: user.value.password,
+        description: "",
+      };
+      api
+        .post("/records/users", u)
+        .then((response) => {
+          if (response.data) {
+            $q.notify({
+              color: "green",
+              position: "top",
+              message: "Вы успешно зарегистрированы",
+            });
+          }
+        })
+        .catch(() => {
+          console.log("error list tests");
+        });
+    }
+
+    return {
+      user,
+      AddUser,
+    };
+  },
+};
 </script>

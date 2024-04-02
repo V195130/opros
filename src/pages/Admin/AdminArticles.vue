@@ -22,18 +22,14 @@
     </template>
   </q-table>
   <div class="flex flex-center q-mt-md">
-    <q-form
-      @submit="addTest()"
-      @reset="resetForm"
-      class="q-gutter-md"
-      style="width: 400px"
-    >
+    <q-form @submit="addTest()" @reset="resetForm" class="q-gutter-md">
       <q-input
         filled
         v-model="newTest.name_test"
         label="Название Статьи"
         required
         lazy-rules
+        style="width: 400px"
         :rules="[
           (val) =>
             (val && val.length > 0) || 'Пожалуйста, введите название статьи',
@@ -47,6 +43,7 @@
         :options="ListSections"
         option-value="id_section"
         option-label="name_section"
+        style="width: 400px"
         @update:model-value="
           (value) => {
             newTest.id_section = value;
@@ -60,8 +57,13 @@
         ]"
       />
 
-      <q-input filled v-model="newTest.description_test" label="Описание" />
       <q-input
+        filled
+        style="width: 400px"
+        v-model="newTest.description_test"
+        label="Описание"
+      />
+      <!-- <q-input
         filled
         v-model="newTest.article"
         label="Содержание статьи"
@@ -71,8 +73,15 @@
           (val) =>
             (val && val.length > 0) || 'Пожалуйста, введите содержание статьи',
         ]"
-      />
-      <div>
+      /> -->
+      <froala
+        id="edit"
+        :tag="'textarea'"
+        :config="configEditor"
+        v-model:value="newTest.article"
+        class="froala-editor"
+      ></froala>
+      <div style="width: 400px" class="q-gutter-md">
         <q-btn
           :label="isEdit ? 'Изменить' : 'Добавить'"
           @click="addTest()"
@@ -112,6 +121,11 @@ export default {
     const ListTest = ref([]);
     const ListSections = ref([]);
     const isEdit = ref(false);
+    const configEditor = ref({
+      heightMin: 300,
+      heightMax: 700,
+    });
+
     const columns = ref([
       {
         name: "name_test",
@@ -191,7 +205,7 @@ export default {
             }
           })
           .catch(() => {
-            console.log("error");
+            console.log("error delete test");
           });
       });
     }
@@ -202,7 +216,9 @@ export default {
 
     function addTest() {
       if (isEdit.value) {
-        let id_section = newTest.value.id_section.id_section;
+        let id_section = ListSections.value.filter(
+          (x) => x.name_section == newTest.value.name_section
+        )[0].id_section;
         newTest.value.id_section = id_section;
         api
           .put("/records/tests/" + newTest.value.id_test, newTest.value)
@@ -303,7 +319,15 @@ export default {
       gotoQuestions,
       resetForm,
       ListSections,
+      configEditor,
     };
   },
 };
 </script>
+
+<style>
+.froala-editor {
+  max-height: 300px; /* или любая другая фиксированная высота */
+  overflow: auto;
+}
+</style>

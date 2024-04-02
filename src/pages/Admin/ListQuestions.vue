@@ -18,6 +18,12 @@
         />
         <q-btn
           flat
+          icon="list"
+          color="green"
+          @click="ShowAnswers(props.row.id_question)"
+        />
+        <q-btn
+          flat
           icon="delete"
           color="red"
           @click="deleteQuestions(props.row)"
@@ -50,6 +56,39 @@
       </div>
     </q-form>
   </div>
+  <div v-if="showedAnswers" class="flex flex-center q-mt-md">
+    <div class="q-gutter-sm">
+      <div
+        v-for="(option, index) in ListAnswers"
+        :key="index"
+        class="row items-center q-gutter-sm"
+      >
+        <q-radio v-model="option.is_correct" :val="index" />
+        <q-input
+          v-model="option.text_answer"
+          label="Вариант ответа"
+          filled
+          style="width: 500px"
+        />
+        <q-btn
+          icon="delete"
+          round
+          dense
+          flat
+          color="negative"
+          @click="deleteOption(index)"
+        />
+      </div>
+    </div>
+  </div>
+  <div class="flex flex-center q-mt-md q-mb-md" v-if="showedAnswers">
+    <q-btn
+      label="Добавить вариант"
+      icon="add"
+      @click="addOption"
+      color="primary"
+    />
+  </div>
 </template>
 
 <script>
@@ -73,7 +112,9 @@ export default {
   setup(props) {
     const router = useRouter();
     const ListQuestions = ref([]);
+    const ListAnswers = ref([]);
     const isEdit = ref(false);
+    const showedAnswers = ref(false);
     const columns = ref([
       {
         name: "question_text",
@@ -106,6 +147,12 @@ export default {
       console.log("editQuestions", data);
       isEdit.value = true;
       newQuestion.value = JSON.parse(JSON.stringify(toRaw(data)));
+    }
+
+    function ShowAnswers(id) {
+      console.log("ShowAnswers");
+      showedAnswers.value = true;
+      getDataListAnswers(id);
     }
 
     function deleteQuestions(Question) {
@@ -182,6 +229,24 @@ export default {
           });
         });
     }
+    function getDataListAnswers(id_question) {
+      api
+        .get("/records/answers?filter=id_question,eq," + id_question)
+        .then((response) => {
+          if (response.data) {
+            ListAnswers.value = response.data.records;
+          }
+        })
+        .catch(() => {
+          console.log("error");
+          $q.notify({
+            color: "negative",
+            position: "top",
+            message: "Ошибка загрузки списка",
+            icon: "report_problem",
+          });
+        });
+    }
 
     return {
       ListQuestions,
@@ -191,6 +256,10 @@ export default {
       addQuestion,
       isEdit,
       editQuestions,
+      getDataListAnswers,
+      showedAnswers,
+      ShowAnswers,
+      ListAnswers,
     };
   },
 };

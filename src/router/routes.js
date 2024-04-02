@@ -39,6 +39,19 @@ const routes = [
         component: () => import("pages/Admin/ListSections.vue"),
       },
       {
+        path: "/Admin/AdminUsers",
+        component: () => import("pages/Admin/AdminUsers.vue"),
+      },
+      {
+        path: "/Admin/ListResults/:id_user",
+        props: true,
+        component: () => import("pages/Admin/ListResults.vue"),
+      },
+      {
+        path: "/ListURL",
+        component: () => import("pages/ListURL.vue"),
+      },
+      {
         path: "/Admin/AdminArticles",
         component: () => import("pages/Admin/AdminArticles.vue"),
       },
