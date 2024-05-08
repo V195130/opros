@@ -9,6 +9,8 @@
       "
       v-if="unproxiedList.length"
     >
+      <div class="text-h5">Тема: {{ NameTest }}</div>
+
       <div class="text-h6 text-center q-my-md">
         {{ currentQuestion + 1 }}.
         {{ unproxiedList[currentQuestion].question_text }}
@@ -87,6 +89,7 @@ export default {
     const ListQuestions = ref([]);
     const ListAnswers = ref([]);
     const list_test = ref([]);
+    const NameTest = ref("");
 
     const currentQuestion = ref(0);
     const selectedOption = ref([]);
@@ -103,16 +106,9 @@ export default {
 
     onMounted(() => {
       getDataTest();
+      getNameTest();
       getAnswers();
     });
-
-    //TODO сделать сохранение результутатов теста в базу
-    // добавить таблицу results с полями
-    // id_result : ai, int, primary
-    // id_user int
-    // id_test int
-    // result - int
-    // date_test - дата и время
 
     function saveResultUser() {
       let new_result = {
@@ -216,6 +212,19 @@ export default {
         });
     }
 
+    function getNameTest() {
+      api
+        .get("/records/tests?filter=id_test,eq," + props.id_test)
+        .then((response) => {
+          if (response.data) {
+            NameTest.value = response.data.records[0].name_test;
+          }
+        })
+        .catch(() => {
+          console.log("error");
+        });
+    }
+
     function getAnswers() {
       api
         .get("/records/answers")
@@ -244,6 +253,7 @@ export default {
       isChecked,
       gotoSignup,
       userLogin,
+      NameTest,
     };
   },
 };

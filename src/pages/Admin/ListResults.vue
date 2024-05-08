@@ -48,7 +48,7 @@ export default {
     const ListResults = ref([]);
     const ListTests = ref([]);
     const ListQuestions = ref([]);
-
+    const ListUser = ref([]);
     const userLogin = computed(() => userStore.login || null);
     const role_user = computed(() => userStore.role || null);
 
@@ -95,6 +95,7 @@ export default {
 
     onMounted(() => {
       getDataTests();
+      getUser();
       setTimeout(() => {}, 500);
       getDataQuestions();
       setTimeout(() => {}, 500);
@@ -141,8 +142,11 @@ export default {
               //   (t) => t.id_test == x.id_test
               // ).length;
               return {
-                name_test: x.id_test,
-                login: x.id_user,
+                name_test: ListTests.value.filter(
+                  (t) => t.id_test == x.id_test
+                )[0].name_test,
+                login: ListUser.value.filter((u) => u.id_user == x.id_user)[0]
+                  .login,
                 // n_q: n,
                 ...x,
               };
@@ -153,6 +157,19 @@ export default {
           console.log("error list results");
         });
     }
+    function getUser() {
+      api
+        .get("/records/users")
+        .then((response) => {
+          if (response.data) {
+            ListUser.value = response.data.records;
+          }
+        })
+        .catch(() => {
+          console.log("error");
+        });
+    }
+
     function getDataQuestions() {
       api
         .get("/records/questions")
@@ -180,6 +197,7 @@ export default {
 
     return {
       getDataList,
+      getUser,
       getDataTests,
       ListResults,
       ListQuestions,
