@@ -43,7 +43,7 @@
           Верстка сайта для спортзал
         </div>
 
-        <div @click="openLink('https://двери30.рф')" class="col-md-3 col-xs-6">
+        <div @click="openLink('https://glazunovy.ru/verstka/')" class="col-md-3 col-xs-6">
           <q-img src="~assets/images/verstka.jpg">
             <div class="absolute-bottom-right text-subtitle2"></div>
           </q-img>
