@@ -80,13 +80,11 @@ export default {
         .get("/records/users?filter=login,eq," + name.value)
         .then((response) => {
           if (response.data) {
-            console.log("user", response.data.records);
             if (
               response.data?.records.length &&
               response.data?.records[0].password == password.value
             ) {
               //пишем в pinia
-              console.log(response.data?.records[0]);
               userStore.setUser(response.data?.records[0]);
               router.push({ path: "/ListArticles" });
             } else {

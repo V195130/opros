@@ -9,7 +9,7 @@
               src="https://yt3.googleusercontent.com/FxcDtD2QUqbeI5c11PJD5shgUPOK_zahi3ebXHOjqV8WONAmUgTRR6nIwTitd1kezpARtcIvvT4=s900-c-k-c0x00ffffff-no-rj"
             />
           </q-avatar>
-          Информационные технологии
+          IT-школа программирования для детей
         </q-toolbar-title>
         <div v-if="userLogin != null">
           {{ userLogin }}, <br /><span @click="logout()"> Выйти</span>
@@ -36,7 +36,7 @@
       </q-toolbar>
 
       <q-tabs align="left">
-        <q-route-tab to="/ListArticles" label="статьи" />
+        <q-route-tab to="/ListArticles" label="Курсы" />
         <q-route-tab to="/ListURL" label="Полезные ресурсы" />
         <q-route-tab to="/AboutMe" label="Об Авторе" />
         <q-route-tab
@@ -69,6 +69,12 @@
           label="Результаты"
           style="color: #0000ff"
         />
+        <q-route-tab
+          v-if="userLogin"
+          :to="'/Admin/UserProfile'"
+          label="Профиль"
+          style="color: #0000ff"
+        />
       </q-tabs>
     </q-header>
 
@@ -97,7 +103,6 @@ export default {
     const role_user = computed(() => userStore.role || null);
 
     function logout() {
-      console.log("выход");
       userStore.clearUser();
     }
 

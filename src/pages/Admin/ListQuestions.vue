@@ -144,13 +144,11 @@ export default {
     });
 
     function editQuestions(data) {
-      console.log("editQuestions", data);
       isEdit.value = true;
       newQuestion.value = JSON.parse(JSON.stringify(toRaw(data)));
     }
 
     function ShowAnswers(id) {
-      console.log("ShowAnswers");
       showedAnswers.value = true;
       getDataListAnswers(id);
     }

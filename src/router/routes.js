@@ -48,6 +48,10 @@ const routes = [
         component: () => import("pages/Admin/ListResults.vue"),
       },
       {
+        path: "/Admin/UserProfile",
+        component: () => import("pages/Admin/UserProfile.vue"),
+      },
+      {
         path: "/ListURL",
         component: () => import("pages/ListURL.vue"),
       },

@@ -76,7 +76,6 @@ export default {
         .then((response) => {
           if (response.data) {
             ListSections.value = toRaw(response.data.records);
-            console.log("get", ListSections.value);
           }
         })
         .catch(() => {

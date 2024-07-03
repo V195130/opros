@@ -38,7 +38,6 @@ import {
 import { useRouter } from "vue-router";
 import { useQuasar } from "quasar";
 import { api } from "boot/axios";
-import { useUserStore } from "stores/userStore";
 
 export default {
   name: "ListResults",
@@ -49,9 +48,7 @@ export default {
     const ListTests = ref([]);
     const ListQuestions = ref([]);
     const ListUser = ref([]);
-    const userLogin = computed(() => userStore.login || null);
-    const role_user = computed(() => userStore.role || null);
-
+    
     const columns = ref([
       {
         name: "name_test",
