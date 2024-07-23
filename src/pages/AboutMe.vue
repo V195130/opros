@@ -22,9 +22,6 @@
       </div>
       <div class="fit row justify-center text-h4">Мои проекты</div>
 
-
-
-
       <div class="fit row justify-center">
         <div
           @click="openLink('https://servut.npksarmat.ru/montaz/#/')"
@@ -46,7 +43,10 @@
           Верстка сайта для спортзал
         </div>
 
-        <div @click="openLink('https://glazunovy.ru/verstka/')" class="col-md-3 col-xs-6 q-mr-md">
+        <div
+          @click="openLink('https://glazunovy.ru/verstka/')"
+          class="col-md-3 col-xs-6 q-mr-md"
+        >
           <q-img src="~assets/images/verstka.jpg">
             <div class="absolute-bottom-right text-subtitle2"></div>
           </q-img>
@@ -74,14 +74,8 @@
         </div>
       </div>
 
-
-
-
-
-
-
       <div class="q-md-2 row">
-        <div class="q-pa-md q-gutter-sm text-h4" style="width: 400px;">
+        <div class="q-pa-md q-gutter-sm text-h4">
           Пройденные курсы:
           <q-item
             to="/"
@@ -100,19 +94,21 @@
             <q-item-section class="text-h5">HTML CSS JS</q-item-section>
           </q-item>
 
-          <q-item
-            to="/"
-            @click=
-            dense
-          >
-            <q-item-section class="text-h5">ИНТЕНСИВ Frontend Start</q-item-section>
+          <q-item to="/" @click="dense">
+            <q-item-section class="text-h5"
+              >ИНТЕНСИВ Frontend Start</q-item-section
+            >
           </q-item>
-          <q-item
-            to="/"
-            @click=
-            dense
-          >
-            <q-item-section class="text-h5">ИНТЕНСИВ UX/UI Start</q-item-section>
+          <q-item to="/" @click="dense">
+            <q-item-section class="text-h5"
+              >ИНТЕНСИВ UX/UI Start</q-item-section
+            >
+          </q-item>
+
+          <q-item to="/" @click="dense">
+            <q-item-section class="text-h5"
+              >"Поколение Python": курс для начинающих</q-item-section
+            >
           </q-item>
           <q-item
             to="/"
@@ -184,6 +180,12 @@
             flat
             @click="showSertificat(4)"
           ></q-btn>
+          <q-btn
+            style="width: 50px; height: 50px; margin: 0"
+            icon="description"
+            flat
+            @click="showSertificat(5)"
+          ></q-btn>
           <q-dialog v-model="showDialog" style="width: 1000px">
             <q-card>
               <q-card-section class="row items-center q-pb-none">
@@ -222,6 +224,10 @@ export default {
     }
 
     function showSertificat(id) {
+      if (id == 5) {
+        imageSrc.value =
+          "https://stepik.org/certificate/7c5da69c09946abecbb069ad1701d9f9b57891e0.png?resolution=low";
+      }
       if (id == 4) {
         imageSrc.value =
           "https://itlogia.ru/upload/images/intensive-participant-certificate/1718881487ov1Bl.jpeg";
